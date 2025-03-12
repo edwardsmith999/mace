@@ -101,6 +101,7 @@ class MACECalculator(Calculator):
                 "node_energy",
                 "forces",
                 "stress",
+                "stresses",
             ]
         elif model_type == "DipoleMACE":
             self.implemented_properties = ["dipole"]
@@ -236,12 +237,14 @@ class MACECalculator(Calculator):
             node_energy = torch.zeros(num_models, num_atoms, device=self.device)
             forces = torch.zeros(num_models, num_atoms, 3, device=self.device)
             stress = torch.zeros(num_models, 3, 3, device=self.device)
+            stresses = torch.zeros(num_models, num_atoms, 3, 3, device=self.device)
             dict_of_tensors.update(
                 {
                     "energies": energies,
                     "node_energy": node_energy,
                     "forces": forces,
                     "stress": stress,
+                    "stresses": stresses,
                 }
             )
         if model_type in ["EnergyDipoleMACE", "DipoleMACE"]:
@@ -312,6 +315,8 @@ class MACECalculator(Calculator):
                 ret_tensors["forces"][i] = out["forces"].detach()
                 if out["stress"] is not None:
                     ret_tensors["stress"][i] = out["stress"].detach()
+                if out["stresses"] is not None:
+                    ret_tensors["stresses"][i] = out["stresses"].detach()
             if self.model_type in ["DipoleMACE", "EnergyDipoleMACE"]:
                 ret_tensors["dipole"][i] = out["dipole"].detach()
 
